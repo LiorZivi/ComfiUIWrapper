@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "comfywrap"
+version = "0.1.0"
+description = "Typed, scriptable CLI that drives comfy-cli to run ComfyUI workflows headlessly (LTX-2 text-to-video first)."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "LiorZivi" }]
+# No runtime deps: comfy-cli is invoked as a subprocess, never imported.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+comfywrap = "comfywrap.core.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+comfywrap = ["data/workflows/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

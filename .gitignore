@@ -40,3 +40,6 @@ outputs/
 comfywrap.toml
 config.toml
 .env
+
+# Local scratch / experiments
+.scratch/
