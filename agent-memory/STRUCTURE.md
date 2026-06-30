@@ -25,7 +25,8 @@ Plus the always-applied instruction files (loaded automatically by Copilot):
 ## `human-docs\` — do NOT read (these are for the human maintainer)
 
 `human-docs\HighLevelArchitecture.md`, `human-docs\Implementation.md`,
-`human-docs\skill-invocation.md`, and `human-docs\validation.md` are narrative /
+`human-docs\FirstUseAndHowToRunExplanation.md`, `human-docs\skill-invocation.md`,
+and `human-docs\validation.md` are narrative /
 reference / historical material written for a person. **Everything you need to
 act is in `agent-memory\` + the instruction files above.** For specifics,
 navigate the **code** directly (grep/glob/read `src\comfywrap\`) rather than

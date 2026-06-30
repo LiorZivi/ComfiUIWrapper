@@ -23,7 +23,8 @@ truth; keep them accurate when behavior changes):
 - `README.md` — user-facing setup/usage.
 
 **Do NOT read `human-docs\`.** Those files (`HighLevelArchitecture.md`,
-`Implementation.md`, `skill-invocation.md`, `validation.md`) are
+`Implementation.md`, `FirstUseAndHowToRunExplanation.md`, `skill-invocation.md`,
+`validation.md`) are
 narrative/reference material written for the human maintainer. Everything you
 need to act is in `agent-memory\` + these instruction files; for specifics, read
 the **code** under `src\comfywrap\` directly. Repo-root `spec.md` and

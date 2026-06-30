@@ -115,5 +115,6 @@ Agent-facing (read these):
 Human-only — **do NOT read** (navigate the code under `src\comfywrap\` instead):
 - `human-docs\HighLevelArchitecture.md` — core + driver + adapters and the flow.
 - `human-docs\Implementation.md` — what the project is and how it was built.
+- `human-docs\FirstUseAndHowToRunExplanation.md` — install + run your first generation.
 - `human-docs\skill-invocation.md` — the exact machine-readable contract + exit codes.
 - `human-docs\validation.md` — measured end-to-end results.
