@@ -46,6 +46,10 @@ engine; comfywrap is the typed "capability + contract + provenance" layer on top
 - **`text_to_video` via LTX-2** (`ltx2-t2v`), implemented under
   `src\comfywrap\capabilities\video\text_to_video\`, backed by the API template
   captured from `C:\AI\Softwares\user\default\workflows\video_ltx2_t2v.json`.
+- LTX-2 generates **synchronized audio, including talking characters** — to make a
+  character speak, put the line in the prompt (`...saying: "<line>"`); it lip-syncs
+  natively. Do not mux external TTS. Details in
+  `.github\instructions\capability.instructions.md`.
 - Three commands: `doctor`, `capabilities`, `generate`.
 
 ## The automation contract (what makes it scriptable) — KEEP STABLE

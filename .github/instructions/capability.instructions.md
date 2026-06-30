@@ -37,6 +37,21 @@ BINDINGS)`), and `resolved_params(params)`. It calls
 - LTX-2 is **audio-native**: `--no-audio` is accepted and recorded in provenance
   but there is no clean node toggle, so the produced mp4 still carries audio.
   Document, don't fake it.
+- **Talking characters / spoken dialogue (verified):** LTX-2 generates
+  synchronized audio *including controllable speech with native lip-sync*. To make
+  a character say specific words, put the line **directly in the prompt** — e.g.
+  `...looking at the camera and clearly saying: "<your exact line>"`. LTX-2 renders
+  the speech and the matching lip movement in one pass. (Confirmed empirically:
+  prompting `saying: "I like Coca-Cola"` produced a clip whose audio Whisper
+  transcribed as exactly `I like Coca-Cola`; a full article line round-tripped the
+  same way.) **Do NOT overlay external TTS / mux a separate audio track** to make a
+  character "talk" — that does not lip-sync (the lips were never driven by that
+  audio). Keep spoken lines short (a sentence or two) for the cleanest result; the
+  voice timbre is the model's choice and is not selectable. If a *specific* named
+  voice is required, that is the one case needing a separate lip-sync model
+  (Wav2Lip/LatentSync) on top — not installed by default.
+- To **verify** generated speech without playback, transcribe the audio with
+  faster-whisper (`ffmpeg -i <mp4> -ar 16000 -ac 1 a.wav` → `WhisperModel("small.en")`).
 - Unset knobs are left at the template's baked-in defaults (injection skips
   `None`); `--seed` is randomized and recorded when omitted.
 - Keep `capability_id = "text_to_video"` and `model_id = "ltx2-t2v"` **stable** —
