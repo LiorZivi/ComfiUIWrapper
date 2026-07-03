@@ -1,28 +1,18 @@
 # First use & how to run
 
-> Human guide. A practical, start-to-finish walkthrough of installing `comfywrap`
-> and running your first generation. For *what it is and how it was built* see
-> `human-docs\Implementation.md`; for the exact machine contract see
-> `human-docs\skill-invocation.md`.
+> Human guide. A practical, start-to-finish walkthrough of installing `comfywrap` and running your first generation. For *what it is and how it was built* see `human-docs\Implementation.md`; for the exact machine contract see `human-docs\skill-invocation.md`.
 
 ## 0. What you'll do
 
-Install `comfywrap` into a virtualenv, run `comfywrap doctor` to confirm the
-environment, then `comfywrap generate "<prompt>"` to render an LTX-2 video. The
-tool **drives comfy-cli**, which talks to a **headless ComfyUI** — so ComfyUI must
-be runnable on this machine (it already is on the target workstation).
+Install `comfywrap` into a virtualenv, run `comfywrap doctor` to confirm the environment, then `comfywrap generate "<prompt>"` to render an LTX-2 video. The tool **drives comfy-cli**, which talks to a **headless ComfyUI** — so ComfyUI must be runnable on this machine (it already is on the target workstation).
 
 ## 1. Prerequisites
 
 - **Python 3.12** (`python --version`).
 - **comfy-cli** — provides the `comfy` binary that comfywrap shells out to.
-- **A ComfyUI install with the LTX-2 models** — on this workstation, ComfyUI
-  Desktop runs headless on `127.0.0.1:8000` with its data root at
-  `C:\AI\Softwares`, and the LTX-2 model files live under `C:\AI\Softwares\models\`.
-  You don't configure any of this by hand — `comfywrap doctor` checks it for you.
+- **A ComfyUI install with the LTX-2 models** — on this workstation, ComfyUI Desktop runs headless on `127.0.0.1:8000` with its data root at `C:\AI\Softwares`, and the LTX-2 model files live under `C:\AI\Softwares\models\`. You don't configure any of this by hand — `comfywrap doctor` checks it for you.
 
-> comfywrap itself uses **no** torch/CUDA. The GPU stack (cu12x on the RTX 5090)
-> lives entirely in ComfyUI's own venv (`C:\AI\Softwares\.venv`).
+> comfywrap itself uses **no** torch/CUDA. The GPU stack (cu12x on the RTX 5090) lives entirely in ComfyUI's own venv (`C:\AI\Softwares\.venv`).
 
 ## 2. One-time setup
 
@@ -35,10 +25,7 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"    # comfywrap + test deps
 ```
 
-After this the `comfywrap` and `comfy` commands are at
-`.venv\Scripts\comfywrap.exe` and `.venv\Scripts\comfy.exe`. Either activate the
-venv (`.\.venv\Scripts\Activate.ps1`) so `comfywrap` is on your PATH, or call the
-full path as shown below.
+After this the `comfywrap` and `comfy` commands are at `.venv\Scripts\comfywrap.exe` and `.venv\Scripts\comfy.exe`. Either activate the venv (`.\.venv\Scripts\Activate.ps1`) so `comfywrap` is on your PATH, or call the full path as shown below.
 
 ## 3. Step one — check the environment
 
@@ -46,17 +33,13 @@ full path as shown below.
 .\.venv\Scripts\comfywrap.exe doctor
 ```
 
-Expect `READY` plus four green checks (comfy-cli, GPU, ComfyUI reachable, LTX-2
-models present). Machine-readable form:
+Expect `READY` plus four green checks (comfy-cli, GPU, ComfyUI reachable, LTX-2 models present). Machine-readable form:
 
 ```powershell
 .\.venv\Scripts\comfywrap.exe doctor --json
 ```
 
-If a check fails, fix it before generating — see **Troubleshooting** below. The
-most common first-run issue is ComfyUI not running on `:8000` (exit/`comfyui`
-check fails) — start ComfyUI Desktop, or let comfywrap auto-launch it (it will,
-unless `attach_only` is set).
+If a check fails, fix it before generating — see **Troubleshooting** below. The most common first-run issue is ComfyUI not running on `:8000` (exit/`comfyui` check fails) — start ComfyUI Desktop, or let comfywrap auto-launch it (it will, unless `attach_only` is set).
 
 ## 4. Step two — see what's available
 
@@ -72,15 +55,8 @@ unless `attach_only` is set).
 ```
 
 - The **final stdout line is the absolute path** to the produced `.mp4`.
-- With only a prompt, every other knob keeps the workflow's defaults
-  (720×1280, 192 frames, 24 fps, 20 steps, audio on) and the **seed is random**
-  (and recorded). A first fresh render takes roughly **~100 seconds** on the
-  RTX 5090; a repeat with the **same prompt + seed** returns in well under a
-  second (the warm server serves it from cache).
-- By default the file stays in ComfyUI's output dir:
-  `C:\AI\Softwares\output\video\LTX-2_#####.mp4`, with a `<file>.mp4.json`
-  provenance sidecar beside it. Pass `--output-dir <dir>` to also copy it
-  somewhere of your choosing (collision-safe).
+- With only a prompt, every other knob keeps the workflow's defaults (720×1280, 192 frames, 24 fps, 20 steps, audio on) and the **seed is random** (and recorded). A first fresh render takes roughly **~100 seconds** on the RTX 5090; a repeat with the **same prompt + seed** returns in well under a second (the warm server serves it from cache).
+- By default the file stays in ComfyUI's output dir: `C:\AI\Softwares\output\video\LTX-2_#####.mp4`, with a `<file>.mp4.json` provenance sidecar beside it. Pass `--output-dir <dir>` to also copy it somewhere of your choosing (collision-safe).
 
 ## 6. Step four — scripted use (`--json`)
 
@@ -95,9 +71,7 @@ For automation, add `--json` and read exactly one object from stdout:
   "artifacts": [ { "path": "C:\\tmp\\out\\LTX-2_00049_.mp4", "type": "video/mp4", "metadata": { } } ] }
 ```
 
-A caller reads `artifacts[0].path` and branches on the **exit code** (0 = success;
-see the table below). On failure in `--json` mode you still get exactly one object:
-`{"error": {"code", "kind", "message", "hint", "details"}}`.
+A caller reads `artifacts[0].path` and branches on the **exit code** (0 = success; see the table below). On failure in `--json` mode you still get exactly one object: `{"error": {"code", "kind", "message", "hint", "details"}}`.
 
 ## 7. Tuning a generation
 
@@ -112,24 +86,17 @@ All optional; unset knobs keep the template defaults:
 - `--size WxH` (or `--width`/`--height`) — dimensions are passed through as-is.
 - `--length <frames>` or `--seconds <s>` (converted via `--fps`).
 - `--fps <n>`, `--steps <n>`, `--negative "<text>"`.
-- `--audio` / `--no-audio` — accepted and recorded, but **LTX-2 is audio-native**:
-  the mp4 still carries audio (there is no clean off switch in this workflow).
+- `--audio` / `--no-audio` — accepted and recorded, but **LTX-2 is audio-native**: the mp4 still carries audio (there is no clean off switch in this workflow).
 
 See all flags with `.\.venv\Scripts\comfywrap.exe generate --help`.
 
 ## 8. Performance & keep-warm
 
-ComfyUI loads tens of GB of LTX-2 weights. comfywrap **attaches** to a running
-ComfyUI (e.g. on `:8000`) and **leaves it warm**, so back-to-back generations pay
-the model load only once. Don't start a second ComfyUI on the same box — two
-copies of the weights will oversubscribe VRAM. If nothing is running and
-auto-launch is on, comfywrap starts one headless and keeps it warm.
+ComfyUI loads tens of GB of LTX-2 weights. comfywrap **attaches** to a running ComfyUI (e.g. on `:8000`) and **leaves it warm**, so back-to-back generations pay the model load only once. Don't start a second ComfyUI on the same box — two copies of the weights will oversubscribe VRAM. If nothing is running and auto-launch is on, comfywrap starts one headless and keeps it warm.
 
 ## 9. Configuration (when defaults don't fit)
 
-Precedence: **CLI flag > `CUW_*` env var > config file (`comfywrap.toml` or
-`config.toml` in the working dir) > builtin defaults**. The builtins target this
-workstation and are fully overridable. Common overrides:
+Precedence: **CLI flag > `CUW_*` env var > config file (`comfywrap.toml` or `config.toml` in the working dir) > builtin defaults**. The builtins target this workstation and are fully overridable. Common overrides:
 
 ```powershell
 $env:CUW_PORT = "8188"            # ComfyUI on a different port
@@ -137,10 +104,7 @@ $env:CUW_ATTACH_ONLY = "true"     # never auto-launch; require a running server
 $env:CUW_OUTPUT_DIR = "C:\tmp\out"
 ```
 
-Other keys: `CUW_HOST`, `CUW_AUTO_LAUNCH`, `CUW_KEEP_WARM`,
-`CUW_PER_EVENT_TIMEOUT`, `CUW_COMFY_BIN`, `CUW_COMFYUI_OUTPUT_DIR`,
-`CUW_COMFYUI_MODELS_DIR`, `CUW_COMFYUI_PYTHON`, `CUW_COMFYUI_MAIN`. A config-file
-key is the same name without the `CUW_` prefix, lower-cased (e.g. `port = 8188`).
+Other keys: `CUW_HOST`, `CUW_AUTO_LAUNCH`, `CUW_KEEP_WARM`, `CUW_PER_EVENT_TIMEOUT`, `CUW_COMFY_BIN`, `CUW_COMFYUI_OUTPUT_DIR`, `CUW_COMFYUI_MODELS_DIR`, `CUW_COMFYUI_PYTHON`, `CUW_COMFYUI_MAIN`. A config-file key is the same name without the `CUW_` prefix, lower-cased (e.g. `port = 8188`).
 
 ## 10. Troubleshooting (by exit code)
 

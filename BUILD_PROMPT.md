@@ -1,8 +1,6 @@
 # Build prompt — ComfiUIWrapper
 
-Start a new Copilot CLI session with the working directory set to this folder
-(`C:\Dev\MyRepos\ComfiUIWrapper`), then paste the prompt below to build the
-project. `spec.md` in this repo is the source of truth.
+Start a new Copilot CLI session with the working directory set to this folder (`C:\Dev\MyRepos\ComfiUIWrapper`), then paste the prompt below to build the project. `spec.md` in this repo is the source of truth.
 
 ---
 

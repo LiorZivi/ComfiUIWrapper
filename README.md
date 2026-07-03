@@ -1,17 +1,8 @@
 # comfywrap (ComfiUIWrapper)
 
-A thin, typed, scriptable CLI that turns a prompt + parameters into a locally
-rendered video by **driving [comfy-cli](https://github.com/Comfy-Org/comfy-cli) as
-a subprocess**. v1 ships one capability — `text_to_video` via **LTX-2**
-(`ltx2-t2v`) — behind a stable command/JSON contract, with a provenance sidecar per
-artifact and a documented exit-code taxonomy.
+A thin, typed, scriptable CLI that turns a prompt + parameters into a locally rendered video by **driving [comfy-cli](https://github.com/Comfy-Org/comfy-cli) as a subprocess**. v1 ships one capability — `text_to_video` via **LTX-2** (`ltx2-t2v`) — behind a stable command/JSON contract, with a provenance sidecar per artifact and a documented exit-code taxonomy.
 
-comfy-cli already launches/attaches a headless ComfyUI, converts UI→API graphs,
-tracks progress, and collects outputs. comfywrap adds the typed capability surface,
-parameter injection into a curated workflow template, the stable contract, the
-exit-code mapping, provenance, and a `doctor` check. **comfy-cli is invoked as a
-subprocess and never imported** (crash isolation, dependency isolation, clean GPL
-boundary).
+comfy-cli already launches/attaches a headless ComfyUI, converts UI→API graphs, tracks progress, and collects outputs. comfywrap adds the typed capability surface, parameter injection into a curated workflow template, the stable contract, the exit-code mapping, provenance, and a `doctor` check. **comfy-cli is invoked as a subprocess and never imported** (crash isolation, dependency isolation, clean GPL boundary).
 
 ## Install
 
@@ -21,8 +12,7 @@ pip install comfy-cli          # the engine (provides the `comfy` binary)
 pip install -e .               # comfywrap
 ```
 
-`comfywrap doctor` verifies the rest (GPU, comfy-cli, ComfyUI reachability, LTX-2
-model files).
+`comfywrap doctor` verifies the rest (GPU, comfy-cli, ComfyUI reachability, LTX-2 model files).
 
 ## Quick start
 
@@ -43,15 +33,10 @@ Commands:
 - `capabilities` — list registered capabilities and models.
 - `generate "<prompt>" [options]` — produce an artifact.
 
-`generate` options (the shared video surface):
-`--model <id>` · `--output-dir <dir>` · `--seed <int>` · `--negative "<text>"` ·
-`--size WxH` (or `--width`/`--height`) · `--length <frames>` (or `--seconds`) ·
-`--fps <n>` · `--steps <n>` · `--audio` / `--no-audio`.
-Unset knobs fall back to the workflow template's defaults; `--seed` is random if omitted.
+`generate` options (the shared video surface): `--model <id>` · `--output-dir <dir>` · `--seed <int>` · `--negative "<text>"` · `--size WxH` (or `--width`/`--height`) · `--length <frames>` (or `--seconds`) · `--fps <n>` · `--steps <n>` · `--audio` / `--no-audio`. Unset knobs fall back to the workflow template's defaults; `--seed` is random if omitted.
 
 ### stdout / stderr discipline
-- **Human mode:** each saved artifact's absolute path on its own line; the final
-  stdout line is an absolute artifact path. Diagnostics go to stderr.
+- **Human mode:** each saved artifact's absolute path on its own line; the final stdout line is an absolute artifact path. Diagnostics go to stderr.
 - **`--json` mode:** exactly one JSON object on stdout:
 
 ```json
@@ -62,8 +47,7 @@ Unset knobs fall back to the workflow template's defaults; `--seed` is random if
 }
 ```
 
-On failure in `--json` mode a single object `{"error": {"code", "kind", "message", "hint", "details"}}`
-is written to stdout; the process exit code is the authoritative signal.
+On failure in `--json` mode a single object `{"error": {"code", "kind", "message", "hint", "details"}}` is written to stdout; the process exit code is the authoritative signal.
 
 ### Exit codes
 
@@ -84,10 +68,7 @@ is written to stdout; the process exit code is the authoritative signal.
 
 ## Configuration
 
-Layered precedence: **CLI > `CUW_*` env > config file (`./comfywrap.toml` or
-`./config.toml`) > builtin defaults**. Builtin defaults target the workstation in
-spec Appendix A (ComfyUI Desktop on `127.0.0.1:8000`, data root `C:\AI\Softwares`)
-and are fully overridable.
+Layered precedence: **CLI > `CUW_*` env > config file (`./comfywrap.toml` or `./config.toml`) > builtin defaults**. Builtin defaults target the workstation in spec Appendix A (ComfyUI Desktop on `127.0.0.1:8000`, data root `C:\AI\Softwares`) and are fully overridable.
 
 Common keys (env form in parentheses):
 - `host` (`CUW_HOST`), `port` (`CUW_PORT`) — where ComfyUI runs.
@@ -98,15 +79,11 @@ Common keys (env form in parentheses):
 - `output_dir` (`CUW_OUTPUT_DIR`) — where comfywrap copies artifacts (default: leave in ComfyUI's output dir).
 
 ### Server lifecycle (keep-warm)
-`generate` probes `host:port`; if a ComfyUI is reachable it **attaches**, otherwise
-(when `auto_launch` is on) it launches a headless ComfyUI in the background and
-leaves it warm so subsequent calls skip the multi-tens-of-GB model load. Set
-`attach_only=true` to require an already-running server.
+`generate` probes `host:port`; if a ComfyUI is reachable it **attaches**, otherwise (when `auto_launch` is on) it launches a headless ComfyUI in the background and leaves it warm so subsequent calls skip the multi-tens-of-GB model load. Set `attach_only=true` to require an already-running server.
 
 ## Using it from a backend job (e.g. Azure Service Bus)
 
-The queue consumer is out of scope; it just shells out to comfywrap and branches on
-the exit code:
+The queue consumer is out of scope; it just shells out to comfywrap and branches on the exit code:
 
 ```text
 on message:
@@ -126,14 +103,10 @@ The consumer never touches ComfyUI, the LTX-2 graph, node ids, or comfy-cli.
 
 The registry/adapter seam is modality-agnostic. To add a capability:
 1. Capture an API-format template (see below) and drop it under `data/workflows/`.
-2. Add an adapter package under `capabilities/<family>/<name>/` with a `binding.py`
-   (role→node map), a `schema.py` (typed params), and an `adapter.py` that declares
-   its `capability_id`, `model_id`, `artifact_type` (e.g. `image/png`, `audio/wav`),
-   expected model files, and self-registers via `REGISTRY.register(...)`.
+2. Add an adapter package under `capabilities/<family>/<name>/` with a `binding.py` (role→node map), a `schema.py` (typed params), and an `adapter.py` that declares its `capability_id`, `model_id`, `artifact_type` (e.g. `image/png`, `audio/wav`), expected model files, and self-registers via `REGISTRY.register(...)`.
 3. Import it from `capabilities/__init__.py`.
 
-No `core/` changes are required — the driver resolves any artifact type by file
-extension and the contract is identical across capabilities.
+No `core/` changes are required — the driver resolves any artifact type by file extension and the contract is identical across capabilities.
 
 ## Capturing / refreshing a workflow template
 
@@ -143,8 +116,7 @@ python scripts/capture_template.py `
   "src\comfywrap\data\workflows\ltx2_t2v.api.json"
 ```
 
-This converts a UI workflow to the flat API graph via `comfy run --print-prompt`
-(no execution; needs a reachable ComfyUI for `/object_info`).
+This converts a UI workflow to the flat API graph via `comfy run --print-prompt` (no execution; needs a reachable ComfyUI for `/object_info`).
 
 ## Development
 
@@ -156,5 +128,4 @@ $env:CUW_RUN_INTEGRATION="1"; python -m pytest tests/test_integration.py -q   # 
 
 ## License
 
-MIT. (comfy-cli, invoked only as a subprocess, is GPL-3.0; arm's-length subprocess
-use does not impose its terms on this project.)
+MIT. (comfy-cli, invoked only as a subprocess, is GPL-3.0; arm's-length subprocess use does not impose its terms on this project.)

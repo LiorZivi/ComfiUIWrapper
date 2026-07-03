@@ -1,13 +1,8 @@
 # Templates — copy-shaped skeletons for a new comfywrap capability
 
-These mirror the real `src\comfywrap\capabilities\video\text_to_video\` package.
-Adapt names, the modality folder, the node bindings, and the param surface.
-**Read the live code too** — it is the source of truth.
+These mirror the real `src\comfywrap\capabilities\video\text_to_video\` package. Adapt names, the modality folder, the node bindings, and the param surface. **Read the live code too** — it is the source of truth.
 
-Throughout, `<modality>` is e.g. `video` / `image` / `audio`, `<capability>` is
-e.g. `text_to_video`, and the dotted import depth for the core from a capability
-module is **four dots** (`....core`) because the package is
-`comfywrap.capabilities.<modality>.<capability>`.
+Throughout, `<modality>` is e.g. `video` / `image` / `audio`, `<capability>` is e.g. `text_to_video`, and the dotted import depth for the core from a capability module is **four dots** (`....core`) because the package is `comfywrap.capabilities.<modality>.<capability>`.
 
 ---
 
@@ -170,8 +165,7 @@ If the modality is new, also `src\comfywrap\capabilities\__init__.py`:
 from . import <modality>  # noqa: F401  (registers <modality> capabilities)
 ```
 
-Each `<capability>\__init__.py` can be a one-line docstring; the adapter import in
-the modality manifest is what triggers registration.
+Each `<capability>\__init__.py` can be a one-line docstring; the adapter import in the modality manifest is what triggers registration.
 
 ---
 
@@ -196,8 +190,4 @@ def test_registry_resolves_model():
     assert entry.artifact_type == "<mime>"
 ```
 
-For a process-level contract test (mock the `comfy` subprocess), copy the pattern
-in `tests\test_cli.py` / `tests\test_driver.py`: patch
-`comfywrap.core.driver._default_runner` to return a canned `--json` envelope and
-`comfywrap.core.driver.ComfyDriver.probe` to `True`, set `CUW_COMFYUI_OUTPUT_DIR`
-to a temp dir holding a dummy artifact, then call `comfywrap.core.cli.main([...])`.
+For a process-level contract test (mock the `comfy` subprocess), copy the pattern in `tests\test_cli.py` / `tests\test_driver.py`: patch `comfywrap.core.driver._default_runner` to return a canned `--json` envelope and `comfywrap.core.driver.ComfyDriver.probe` to `True`, set `CUW_COMFYUI_OUTPUT_DIR` to a temp dir holding a dummy artifact, then call `comfywrap.core.cli.main([...])`.

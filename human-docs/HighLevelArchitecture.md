@@ -2,9 +2,7 @@
 
 > Human reference. For the agent's source of truth see `agent-memory\`.
 
-`comfywrap` is a thin, typed CLI that **drives comfy-cli as a subprocess** to run
-ComfyUI workflows headlessly. It is two layers: a reusable, modality-agnostic
-**core** and pluggable **capability adapters**.
+`comfywrap` is a thin, typed CLI that **drives comfy-cli as a subprocess** to run ComfyUI workflows headlessly. It is two layers: a reusable, modality-agnostic **core** and pluggable **capability adapters**.
 
 ## The two layers
 
@@ -46,38 +44,18 @@ comfywrap generate "<prompt>" --json
 
 ## End-to-end flow of `generate`
 
-1. **Dispatch** (`cli.py`): parse args, load layered config, resolve the model in
-   the `REGISTRY` to its `CapabilityEntry` + adapter.
-2. **Validate** (`schema.py`): `build_params(args)` normalizes the typed surface
-   (size `WxH`, seconds→frames, random seed if omitted); bad input → exit 2.
-3. **Inject** (`injection.py`): `prepare_prompt` deep-copies the captured API
-   template and sets the bound node inputs by role (`binding.py`); the concrete
-   prompt is written to a temp `.api.json`.
-4. **Ensure server** (`driver.py`): probe `host:port`; **attach** if reachable,
-   else auto-launch a headless ComfyUI and wait until ready (keep-warm).
-5. **Run** (`driver.py`): `comfy run --wait --json` as a subprocess; parse the
-   NDJSON stream + final `envelope/1`; on failure map `error.code`/exit to the
-   0–11 taxonomy.
-6. **Collect** (`driver.py` + `output.py`): resolve the produced
-   `/view?…&type=output` URL to `<comfyui_output_dir>\<subfolder>\<filename>`;
-   optionally copy into `--output-dir` with a collision-safe name; write the
-   `<artifact>.json` provenance sidecar.
-7. **Emit** (`cli.py`): one JSON object `{capability,model,artifacts:[{path,type,
-   metadata}]}` (or the absolute path as the final stdout line in human mode).
+1. **Dispatch** (`cli.py`): parse args, load layered config, resolve the model in the `REGISTRY` to its `CapabilityEntry` + adapter.
+2. **Validate** (`schema.py`): `build_params(args)` normalizes the typed surface (size `WxH`, seconds→frames, random seed if omitted); bad input → exit 2.
+3. **Inject** (`injection.py`): `prepare_prompt` deep-copies the captured API template and sets the bound node inputs by role (`binding.py`); the concrete prompt is written to a temp `.api.json`.
+4. **Ensure server** (`driver.py`): probe `host:port`; **attach** if reachable, else auto-launch a headless ComfyUI and wait until ready (keep-warm).
+5. **Run** (`driver.py`): `comfy run --wait --json` as a subprocess; parse the NDJSON stream + final `envelope/1`; on failure map `error.code`/exit to the 0–11 taxonomy.
+6. **Collect** (`driver.py` + `output.py`): resolve the produced `/view?…&type=output` URL to `<comfyui_output_dir>\<subfolder>\<filename>`; optionally copy into `--output-dir` with a collision-safe name; write the `<artifact>.json` provenance sidecar.
+7. **Emit** (`cli.py`): one JSON object `{capability,model,artifacts:[{path,type, metadata}]}` (or the absolute path as the final stdout line in human mode).
 
 ## Why the driver is the only place that touches comfy-cli
 
-`src\comfywrap\core\driver.py` is the single quarantine for every
-comfy-cli/ComfyUI-version quirk: argv construction, server lifecycle, the NDJSON
-envelope shape, the `/view`-URL→path resolution, and the error mapping. Because
-comfy-cli is invoked **as a subprocess (never imported)**, a CUDA crash or hang
-kills the child process — not the comfywrap process — and comfywrap stays
-stdlib-only (the heavy torch/cu12x stack lives entirely in ComfyUI's venv).
+`src\comfywrap\core\driver.py` is the single quarantine for every comfy-cli/ComfyUI-version quirk: argv construction, server lifecycle, the NDJSON envelope shape, the `/view`-URL→path resolution, and the error mapping. Because comfy-cli is invoked **as a subprocess (never imported)**, a CUDA crash or hang kills the child process — not the comfywrap process — and comfywrap stays stdlib-only (the heavy torch/cu12x stack lives entirely in ComfyUI's venv).
 
 ## Extensibility
 
-The `registry`/adapter seam is modality-agnostic: an adapter declares its own
-`artifact_type` and param schema, and the driver resolves any output by file
-extension. A future **video or non-video** capability is a new template + adapter
-package + one manifest import line, with no core changes. See
-`agent-memory\adding-a-capability.md`.
+The `registry`/adapter seam is modality-agnostic: an adapter declares its own `artifact_type` and param schema, and the driver resolves any output by file extension. A future **video or non-video** capability is a new template + adapter package + one manifest import line, with no core changes. See `agent-memory\adding-a-capability.md`.

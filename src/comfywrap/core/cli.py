@@ -33,7 +33,19 @@ def _emit_json(obj: dict) -> None:
     sys.stdout.write(json.dumps(obj) + "\n")
 
 
-def build_parser() -> argparse.ArgumentParser:
+def _selected_model(argv: list[str]) -> str:
+    """Peek at ``--model`` before argparse runs so the *selected* model contributes the
+    ``generate`` surface — each adapter then declares only the flags it actually needs."""
+    for index, token in enumerate(argv):
+        if token == "--model" and index + 1 < len(argv):
+            return argv[index + 1]
+        if token.startswith("--model="):
+            return token.split("=", 1)[1]
+    return _DEFAULT_MODEL
+
+
+def build_parser(argv: list[str] | None = None) -> argparse.ArgumentParser:
+    argv = list(sys.argv[1:] if argv is None else argv)
     # Global flags live on a parent parser so they are accepted both before and
     # after the subcommand (spec section 4.1). SUPPRESS keeps unspecified copies
     # from overwriting a value provided in the other position.
@@ -59,11 +71,18 @@ def build_parser() -> argparse.ArgumentParser:
     gen = sub.add_parser("generate", parents=[common], help="Generate an artifact from a prompt.")
     gen.add_argument("--model", help=f"Model id (default: {_DEFAULT_MODEL}).")
     gen.add_argument("--output-dir", dest="output_dir", help="Directory to place the produced artifact.")
-    # The default capability adapter contributes the shared generation surface.
+    # The *selected* capability's adapter contributes its own generation surface, so a
+    # capability with extra flags (e.g. image_to_video's --image) declares only what it
+    # needs and text_to_video is never polluted with flags it would ignore.
     try:
-        REGISTRY.resolve_model(_DEFAULT_MODEL).adapter.add_arguments(gen)
-    except errors.ComfywrapError:  # pragma: no cover - registry always has the default in v1
-        pass
+        REGISTRY.resolve_model(_selected_model(argv)).adapter.add_arguments(gen)
+    except errors.ComfywrapError:
+        # Unknown --model: fall back to the default surface so argparse can still parse;
+        # cmd_generate re-resolves the model and raises the proper error (exit 8).
+        try:
+            REGISTRY.resolve_model(_DEFAULT_MODEL).adapter.add_arguments(gen)
+        except errors.ComfywrapError:  # pragma: no cover - registry always has the default
+            pass
     return parser
 
 
@@ -190,8 +209,9 @@ def _handle_error(err: errors.ComfywrapError, json_mode: bool, verbose: bool, ex
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = build_parser()
-    args = parser.parse_args(list(sys.argv[1:] if argv is None else argv))
+    argv = list(sys.argv[1:] if argv is None else argv)
+    parser = build_parser(argv)
+    args = parser.parse_args(argv)
     json_mode = bool(getattr(args, "json", False))
     verbose = bool(getattr(args, "verbose", False))
 

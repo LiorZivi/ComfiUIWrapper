@@ -42,7 +42,7 @@ class TextToVideoAdapter:
     artifact_type = ARTIFACT_TYPE
 
     def add_arguments(self, parser) -> None:
-        """Contribute the shared video-generation surface to the ``generate`` subparser."""
+        """Contribute the text-to-video generation surface to the ``generate`` subparser."""
         parser.add_argument("prompt", help="Text prompt for the video.")
         parser.add_argument("--negative", help="Negative prompt.")
         parser.add_argument("--seed", type=int, help="Reproducibility seed (random if omitted).")

@@ -1,7 +1,6 @@
 # Skill / automation invocation — the exact contract
 
-> Human reference for anyone wiring `comfywrap` into a script, agent, CI job, or
-> queue worker. This contract is **stable**; build against it.
+> Human reference for anyone wiring `comfywrap` into a script, agent, CI job, or queue worker. This contract is **stable**; build against it.
 
 ## Grammar
 
@@ -15,17 +14,11 @@ Global flags work **before or after** the subcommand. Commands:
 - `capabilities` — list registered capabilities and models.
 - `generate "<prompt>" [options]` — produce an artifact.
 
-`generate` options (the shared video surface):
-`--model <id>` (default `ltx2-t2v`) · `--output-dir <dir>` · `--seed <int>` ·
-`--negative "<text>"` · `--size WxH` (or `--width`/`--height`) ·
-`--length <frames>` (or `--seconds`) · `--fps <n>` · `--steps <n>` ·
-`--audio` / `--no-audio`. Unset knobs use the template defaults; `--seed` is
-random (and recorded) if omitted.
+`generate` options (the shared video surface): `--model <id>` (default `ltx2-t2v`) · `--output-dir <dir>` · `--seed <int>` · `--negative "<text>"` · `--size WxH` (or `--width`/`--height`) · `--length <frames>` (or `--seconds`) · `--fps <n>` · `--steps <n>` · `--audio` / `--no-audio`. Unset knobs use the template defaults; `--seed` is random (and recorded) if omitted.
 
 ## stdout / stderr discipline
 
-- **Human mode:** each saved artifact's absolute path on its own line; the
-  **final stdout line is an absolute artifact path**. Diagnostics → stderr.
+- **Human mode:** each saved artifact's absolute path on its own line; the **final stdout line is an absolute artifact path**. Diagnostics → stderr.
 - **`--json` mode:** exactly **one** JSON object on stdout, nothing else.
 
 Success envelope:
@@ -68,10 +61,7 @@ argparse usage errors (unknown flag, missing prompt) also exit **2**.
 
 ## Provenance sidecar
 
-Every artifact gets a `<artifact>.json` sidecar, identical to the embedded
-`artifacts[0].metadata`: capability, model, prompt, negative, seed, resolved
-params, workflow template, model file names, `prompt_id`, `elapsed_seconds`,
-output filename, host/port, comfywrap version, and start/end timestamps.
+Every artifact gets a `<artifact>.json` sidecar, identical to the embedded `artifacts[0].metadata`: capability, model, prompt, negative, seed, resolved params, workflow template, model file names, `prompt_id`, `elapsed_seconds`, output filename, host/port, comfywrap version, and start/end timestamps.
 
 ## Example: an Azure Service Bus consumer (out of scope; this is the seam it calls)
 
@@ -87,14 +77,8 @@ on message:
   exit 1,3,4,10     -> dead-letter + alert
 ```
 
-The consumer never touches ComfyUI, the LTX-2 graph, node ids, or comfy-cli. To
-keep latency low across many messages, leave a warm ComfyUI on `:8000` (or rely on
-comfywrap's auto-launch + keep-warm) so model weights load once.
+The consumer never touches ComfyUI, the LTX-2 graph, node ids, or comfy-cli. To keep latency low across many messages, leave a warm ComfyUI on `:8000` (or rely on comfywrap's auto-launch + keep-warm) so model weights load once.
 
 ## Config knobs a caller may set (env form)
 
-`CUW_HOST`, `CUW_PORT`, `CUW_AUTO_LAUNCH`, `CUW_KEEP_WARM`, `CUW_ATTACH_ONLY`,
-`CUW_PER_EVENT_TIMEOUT`, `CUW_COMFY_BIN`, `CUW_OUTPUT_DIR`,
-`CUW_COMFYUI_OUTPUT_DIR`, `CUW_COMFYUI_MODELS_DIR`, `CUW_COMFYUI_PYTHON`,
-`CUW_COMFYUI_MAIN`. Precedence: CLI flag > `CUW_*` env > config file
-(`comfywrap.toml` / `config.toml`) > builtin defaults.
+`CUW_HOST`, `CUW_PORT`, `CUW_AUTO_LAUNCH`, `CUW_KEEP_WARM`, `CUW_ATTACH_ONLY`, `CUW_PER_EVENT_TIMEOUT`, `CUW_COMFY_BIN`, `CUW_OUTPUT_DIR`, `CUW_COMFYUI_OUTPUT_DIR`, `CUW_COMFYUI_MODELS_DIR`, `CUW_COMFYUI_PYTHON`, `CUW_COMFYUI_MAIN`. Precedence: CLI flag > `CUW_*` env > config file (`comfywrap.toml` / `config.toml`) > builtin defaults.
