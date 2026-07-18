@@ -1,4 +1,12 @@
-# comfywrap (ComfiUIWrapper)
+# Archived: comfywrap moved to KnowledgeBites
+
+This repository is retired and read-only. The authoritative source, workflows, tests, documentation, and release pipeline now live at:
+
+`KnowledgeBites/Src/ComfyUIWrapper`
+
+Final standalone source tag: `standalone-final`.
+
+# comfywrap (ComfyUIWrapper)
 
 A thin, typed, scriptable CLI that turns a prompt + parameters into a locally rendered video by **driving [comfy-cli](https://github.com/Comfy-Org/comfy-cli) as a subprocess**. v1 ships one capability — `text_to_video` via **LTX-2** (`ltx2-t2v`) — behind a stable command/JSON contract, with a provenance sidecar per artifact and a documented exit-code taxonomy.
 
